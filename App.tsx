@@ -1,10 +1,10 @@
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Sparkles, Filter, CheckCircle2, ListTodo, CircleDashed, Loader2 } from 'lucide-react';
-import { Todo, Priority, FilterType, SuggestionResponse } from './types';
-import { TodoItem } from './components/TodoItem';
-import { getSmartSuggestions } from './services/geminiService';
+import { Plus, Sparkles, CheckCircle2, ListTodo, CircleDashed, Loader2 } from 'lucide-react';
+import { Todo, Priority, FilterType, SuggestionResponse } from './types.ts';
+import { TodoItem } from './components/TodoItem.tsx';
+import { getSmartSuggestions } from './services/geminiService.ts';
 
 const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>(() => {
@@ -57,9 +57,14 @@ const App: React.FC = () => {
       ? `Currently working on: ${todos.slice(0, 5).map(t => t.text).join(', ')}`
       : "No tasks yet, suggest some general productivity goals.";
     
-    const result = await getSmartSuggestions(context);
-    setSuggestions(result.suggestions);
-    setIsSuggesting(false);
+    try {
+      const result = await getSmartSuggestions(context);
+      setSuggestions(result.suggestions);
+    } catch (error) {
+      console.error("Suggestions failed:", error);
+    } finally {
+      setIsSuggesting(false);
+    }
   };
 
   const filteredTodos = useMemo(() => {
@@ -175,7 +180,7 @@ const App: React.FC = () => {
                 </motion.button>
               ))}
               {suggestions.length === 0 && !isSuggesting && (
-                <div className="text-slate-400 text-xs italic py-2">Click "Get AI Ideas" for personalized suggestions...</div>
+                <div className="text-slate-400 text-xs italic py-2">Kliknij "Get AI Ideas" dla sugestii...</div>
               )}
             </AnimatePresence>
           </div>
@@ -201,11 +206,11 @@ const App: React.FC = () => {
           <div className="flex items-center gap-4">
              <div className="text-xs font-semibold text-slate-400 uppercase flex items-center gap-1.5">
                <CircleDashed size={14} className="text-indigo-400" />
-               {stats.active} Active
+               {stats.active} Aktywne
              </div>
              <div className="text-xs font-semibold text-slate-400 uppercase flex items-center gap-1.5">
                <CheckCircle2 size={14} className="text-emerald-400" />
-               {stats.completed} Done
+               {stats.completed} Gotowe
              </div>
           </div>
         </section>
@@ -231,8 +236,8 @@ const App: React.FC = () => {
                 <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-100 text-slate-300 mb-4">
                   <ListTodo size={40} />
                 </div>
-                <h3 className="text-slate-400 font-medium">Nothing to see here...</h3>
-                <p className="text-slate-300 text-sm mt-1">Start adding some tasks or use AI for ideas!</p>
+                <h3 className="text-slate-400 font-medium">Brak zadań do wyświetlenia...</h3>
+                <p className="text-slate-300 text-sm mt-1">Dodaj zadanie lub użyj AI dla pomysłów!</p>
               </motion.div>
             )}
           </AnimatePresence>

@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Check, Trash2, GripVertical } from 'lucide-react';
-import { Todo } from '../types';
-import { PriorityBadge } from './PriorityBadge';
+import { Check, Trash2 } from 'lucide-react';
+import { Todo } from '../types.ts';
+import { PriorityBadge } from './PriorityBadge.tsx';
 
 interface TodoItemProps {
   todo: Todo;

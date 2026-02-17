@@ -1,13 +1,16 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { SuggestionResponse } from "../types";
-
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+import { SuggestionResponse } from "../types.ts";
 
 export const getSmartSuggestions = async (context: string): Promise<SuggestionResponse> => {
-  const model = ai.models.generateContent({
+  // Bezpieczny dostęp do klucza API ze zmiennych środowiskowych
+  const apiKey = (window as any).process?.env?.API_KEY || (process as any)?.env?.API_KEY || '';
+  
+  const ai = new GoogleGenAI({ apiKey });
+  
+  const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
-    contents: `Suggest 3-5 productive tasks or subtasks based on the following context: "${context}". Make them actionable and concise.`,
+    contents: `Suggest 3-5 productive tasks or subtasks based on the following context: "${context}". Make them actionable and concise. Return results in Polish.`,
     config: {
       responseMimeType: "application/json",
       responseSchema: {
@@ -31,11 +34,10 @@ export const getSmartSuggestions = async (context: string): Promise<SuggestionRe
     }
   });
 
-  const response = await model;
   try {
     return JSON.parse(response.text || '{"suggestions": []}');
   } catch (error) {
-    console.error("Failed to parse Gemini response", error);
+    console.error("Błąd parsowania odpowiedzi Gemini", error);
     return { suggestions: [] };
   }
 };
